@@ -1,6 +1,7 @@
 const grpcServer = {};
 const {createServer} = require('grpc-kit');
 const logger = require('./logger')();
+const grpc = require('grpc');
 
 let server;
 grpcServer.start = () =>
@@ -12,7 +13,7 @@ grpcServer.start = () =>
         packageName: 'com.isc.npsd.instantpayment.grpc',
         serviceName: 'IPCoreService',
         routes: {
-          processMessage: (call, callback) => {
+          processMessage:  (call, callback) => {
             logger.info(`message received : ${ JSON.stringify(call.request) }`);
             callback(null, { message : '1' });
           }
@@ -22,12 +23,15 @@ grpcServer.start = () =>
           longs: String,
           enums: String,
           defaults: true,
-          oneofs: true
+          oneofs: true,
+          
         }
       });
       
       const port = process.env.GRPC_PORT;
-      server.listen(`0.0.0.0:${port}`);
+      const max_connection_age_ms = process.env.MAX_CONNECTION_AGE_MS || 1000;
+      server.listen(`0.0.0.0:${port}`,grpc.ServerCredentials.createInsecure(),{'grpc.max_connection_age_ms' : max_connection_age_ms});
+      //server.listen(`0.0.0.0:${port}`,grpc.ServerCredentials.createInsecure());
       logger.info(`gRPC server is now listening on port : ${port}`);
 }
 
@@ -35,8 +39,7 @@ grpcServer.stop = () =>
 {
   if (server)
   {
-    server.stop();
-    logger.info('gRPC Server stopped.');
+    server.close(() => {logger.info('gRPC Server stopped.')});
   }
 } 
 

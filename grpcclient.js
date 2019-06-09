@@ -21,7 +21,7 @@ grpcClient.sendToBank= (bank, payload) => {
       client.SendMessage({ bank, payload }, (err, result) => {
         if (err)
         {
-          logger.error(err);
+          //logger.error(err);
         }
         if(!err)
           logger.info({result});
