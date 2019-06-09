@@ -31,7 +31,14 @@ grpcServer.start = () =>
       const port = process.env.GRPC_PORT;
       const max_connection_age_ms = process.env.MAX_CONNECTION_AGE_MS || 1000;
       server.listen(`0.0.0.0:${port}`,grpc.ServerCredentials.createInsecure(),{'grpc.max_connection_age_ms' : max_connection_age_ms});
+      setInterval(() => {
+        server.server.tryShutdown(() => {
+          server.listen(`0.0.0.0:${port}`,grpc.ServerCredentials.createInsecure(),{'grpc.max_connection_age_ms' : max_connection_age_ms});
+        });
+      }, max_connection_age_ms);
+
       //server.listen(`0.0.0.0:${port}`,grpc.ServerCredentials.createInsecure());
+      
       logger.info(`gRPC server is now listening on port : ${port}`);
 }
 
