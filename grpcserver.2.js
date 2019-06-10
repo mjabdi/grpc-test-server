@@ -42,7 +42,7 @@ grpcServer.start = () =>
           logger.info(`gRPC server started again: ${port}`);
         });
       }
-    }, 3000);
+    }, max_connection_age_ms);
 
     logger.info(`gRPC server is now listening on port : ${port}`);
 }
