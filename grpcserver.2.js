@@ -18,17 +18,18 @@ grpcServer.start = () =>
     });
 
     var hello_proto = grpc.loadPackageDefinition(packageDefinition).banktocore;
-
-    server = new grpc.Server();
+    
+    const max_connection_age_ms = process.env.MAX_CONNECTION_AGE_MS || 1000;
+    server = new grpc.Server({'grpc.max_connection_age_ms' : max_connection_age_ms});
     server.addService(hello_proto.IPCoreService.service, {processMessage: (call, callback) => {
       logger.info(`message received : ${ JSON.stringify(call.request) }`);
       callback(null, { message : '1' });
     }});
 
     const port = process.env.GRPC_PORT;
-    const max_connection_age_ms = process.env.MAX_CONNECTION_AGE_MS || 1000;
+ 
 
-    server.bind(`0.0.0.0:${port}`, grpc.ServerCredentials.createInsecure(), {'grpc.max_connection_age_ms' : max_connection_age_ms});
+    server.bind(`0.0.0.0:${port}`, grpc.ServerCredentials.createInsecure());
 
     server.start();
 
