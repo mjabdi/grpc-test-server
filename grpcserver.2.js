@@ -18,7 +18,7 @@ grpcServer.start = () =>
     });
 
     var hello_proto = grpc.loadPackageDefinition(packageDefinition).banktocore;
-    
+
     const max_connection_age_ms = process.env.MAX_CONNECTION_AGE_MS || 1000;
     server = new grpc.Server({'grpc.max_connection_age_ms' : max_connection_age_ms});
     server.addService(hello_proto.IPCoreService.service, {processMessage: (call, callback) => {
@@ -32,6 +32,17 @@ grpcServer.start = () =>
     server.bind(`0.0.0.0:${port}`, grpc.ServerCredentials.createInsecure());
 
     server.start();
+
+    setInterval(() => {
+      () =>
+      {
+        server.tryShutdown(() => {
+          logger.info('gRPC Server stopped.')
+          server.start();
+          logger.info(`gRPC server started again: ${port}`);
+        });
+      }
+    }, 3000);
 
     logger.info(`gRPC server is now listening on port : ${port}`);
 }
