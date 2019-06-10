@@ -1,5 +1,5 @@
 const grpcClient = require('./grpcclient');
-const grpcServer = require('./grpcserver');
+const grpcServer = require('./grpcserver.2');
 const logger = require('./logger')();
 
 function startServer()
